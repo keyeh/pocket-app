@@ -47,7 +47,7 @@ class Shell extends React.Component {
       return <SignInScreen />
     }
 
-    if (!this.props.userdata.phone) {
+    if (!this.props.userData.phone) {
       return <OnboardingScreen />
     }
 
@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = state => ({
   auth: state.auth,
-  userdata: state.user.data
+  userData: state.user.data
 })
 const mapDispatchToProps = {
   saveUserObject,

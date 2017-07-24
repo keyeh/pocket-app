@@ -19,7 +19,7 @@ export const subscribeToUserData = (ctx, fbUid) => {
 
 export const unsubscribeToUserData = () => {
   return (dispatch, getState) => {
-    const userListener = getState().user._userListener
+    const userListener = getState().user.userListener
     if (userListener) {
       Base.removeBinding(userListener)
       dispatch({type: UNSUBSCRIBED_TO_USER})

@@ -6,7 +6,7 @@ import {
 } from "../actions"
 
 const initialState = {
-  _userListener: null,
+  userListener: null,
   data: {}
 }
 
@@ -19,7 +19,7 @@ export default (state = initialState, action) => {
     case SUBSCRIBED_TO_USER:
       return {
         ...state,
-        _userListener: action.payload
+        userListener: action.payload
       }
     case USER_DATA_UPDATED:
       return {
