@@ -4,6 +4,7 @@ import { connect } from "react-redux"
 import { AppLoading, Asset, Font } from "expo"
 import SignInScreen from "./screens/auth/SignInScreen"
 import SignUpScreen from "./screens/auth/SignUpScreen"
+import OnboardingScreen from "./screens/auth/OnboardingScreen"
 import { Ionicons } from "@expo/vector-icons"
 import RootNavigation from "./navigation/RootNavigation"
 import Base from "./Base"
@@ -44,6 +45,10 @@ class Shell extends React.Component {
 
     if (!this.props.auth.user) {
       return <SignInScreen />
+    }
+
+    if (!this.props.user.phone) {
+      return <OnboardingScreen />
     }
 
     return (
