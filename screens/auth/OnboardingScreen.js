@@ -43,7 +43,6 @@ class OnboardingScreen extends React.Component {
         <FormLabel>Phone</FormLabel>
         <FormInput onChangeText={this._handlePhoneChange} value={formPhone} />
         <Button
-          icon={{ name: "envira", type: "font-awesome" }}
           title="Save"
           onPress={this._handleSaveButtonPress}
           style={styles.nextButton}
@@ -75,7 +74,7 @@ const styles = StyleSheet.create({
 })
 
 const mapStateToProps = state => ({
-  userPhone: state.user.phone,
+  userPhone: state.user.data.phone,
   fbUid: state.auth.user.uid
 })
 const mapDispatchToProps = {}
