@@ -26,11 +26,9 @@ class Shell extends React.Component {
       if (user) {
         this.props.saveUserObject(user)
         this.props.subscribeToUserData(this, user.uid)
-        this.setState({ isAuthed: true })
       } else {
         this.props.unsubscribeToUserData()
         this.props.signedOutUser()
-        this.setState({ isAuthed: false })
       }
     })
   }
