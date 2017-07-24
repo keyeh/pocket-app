@@ -3,7 +3,7 @@ import { ExpoConfigView } from "@expo/samples"
 import { connect } from "react-redux"
 import { View, Text } from "react-native"
 import { Button } from "react-native-elements"
-import { signOutUser } from "../actions"
+import Base from "../Base"
 
 class SettingsScreen extends React.Component {
   constructor(props) {
@@ -17,7 +17,7 @@ class SettingsScreen extends React.Component {
   }
 
   _handleSignOutButtonPress() {
-    this.props.signOutUser()
+    Base.initializedApp.auth().signOut()
   }
 
   render() {
@@ -35,8 +35,6 @@ class SettingsScreen extends React.Component {
 }
 
 const mapStateToProps = state => ({ reduxTree: state })
-const mapDispatchToProps = {
-  signOutUser
-}
+const mapDispatchToProps = {}
 
 export default connect(mapStateToProps, mapDispatchToProps)(SettingsScreen)

@@ -7,23 +7,29 @@ import SignUpScreen from "./screens/auth/SignUpScreen"
 import { Ionicons } from "@expo/vector-icons"
 import RootNavigation from "./navigation/RootNavigation"
 import Base from "./Base"
-import { saveUserObject, listenToUserData } from "./actions"
+import {
+  saveUserObject,
+  subscribeToUserData,
+  unsubscribeToUserData,
+  signedOutUser
+} from "./actions"
 
 class Shell extends React.Component {
   constructor(props) {
     super(props)
 
     this.state = {
-      assetsAreLoaded: false,
-      isAuthed: false
+      assetsAreLoaded: false
     }
 
     Base.initializedApp.auth().onAuthStateChanged(user => {
       if (user) {
         this.props.saveUserObject(user)
-        this.props.listenToUserData(this, user.uid)
+        this.props.subscribeToUserData(this, user.uid)
         this.setState({ isAuthed: true })
       } else {
+        this.props.unsubscribeToUserData()
+        this.props.signedOutUser()
         this.setState({ isAuthed: false })
       }
     })
@@ -38,7 +44,7 @@ class Shell extends React.Component {
       return <AppLoading />
     }
 
-    if (!this.state.isAuthed) {
+    if (!this.props.auth.user) {
       return <SignInScreen />
     }
 
@@ -91,13 +97,15 @@ const styles = StyleSheet.create({
   }
 })
 
-
 const mapStateToProps = state => ({
   auth: state.auth,
   user: state.user
 })
 const mapDispatchToProps = {
-  saveUserObject, listenToUserData
+  saveUserObject,
+  subscribeToUserData,
+  unsubscribeToUserData,
+  signedOutUser
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Shell)

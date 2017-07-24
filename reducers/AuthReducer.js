@@ -1,10 +1,10 @@
 import {
-  SIGNUP_USER_START,
-  SIGNUP_USER_FAILED,
-  SIGNIN_USER_START,
-  SIGNIN_USER_SUCCESS,
-  SIGNIN_USER_FAILED,
-  SIGNOUT_USER
+  SIGN_UP_USER_START,
+  SIGN_UP_USER_FAILED,
+  SIGN_IN_USER_START,
+  SIGN_IN_USER_SUCCESS,
+  SIGN_IN_USER_FAILED,
+  SIGNED_OUT_USER
 } from "../actions"
 
 const initialState = {
@@ -15,17 +15,17 @@ const initialState = {
 
 export default (state = initialState, action) => {
   switch (action.type) {
-    case SIGNOUT_USER:
+    case SIGNED_OUT_USER:
       return initialState
 
-    case SIGNUP_USER_START:
-    case SIGNIN_USER_START:
+    case SIGN_UP_USER_START:
+    case SIGN_IN_USER_START:
       return {
         ...state,
         loading: true,
         error: {}
       }
-    case SIGNIN_USER_SUCCESS:
+    case SIGN_IN_USER_SUCCESS:
       return {
         ...state,
         user: action.payload,
@@ -33,8 +33,8 @@ export default (state = initialState, action) => {
         loading: false
       }
 
-    case SIGNUP_USER_FAILED:
-    case SIGNIN_USER_FAILED:
+    case SIGN_UP_USER_FAILED:
+    case SIGN_IN_USER_FAILED:
       return {
         ...state,
         error: action.payload,

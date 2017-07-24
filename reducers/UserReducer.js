@@ -1,16 +1,18 @@
 import {
   SUBSCRIBED_TO_USER,
+  UNSUBSCRIBED_TO_USER,
   USER_DATA_UPDATED,
-  SIGNOUT_USER
+  SIGNED_OUT_USER
 } from "../actions"
 
 const initialState = {
-  _userListener: null,
+  _userListener: null
 }
 
 export default (state = initialState, action) => {
   switch (action.type) {
-    case SIGNOUT_USER:
+    case UNSUBSCRIBED_TO_USER:
+    case SIGNED_OUT_USER:
       return initialState
 
     case SUBSCRIBED_TO_USER:
