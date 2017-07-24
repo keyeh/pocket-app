@@ -1,6 +1,7 @@
 import { compose, createStore, applyMiddleware } from "redux"
 // import { autoRehydrate } from 'redux-persist'
 import ReduxThunk from "redux-thunk"
+import logger from 'redux-logger'
 import devToolsEnhancer from "remote-redux-devtools"
 import rootReducer from "./reducers"
 
@@ -9,7 +10,7 @@ const Store = createStore(
   devToolsEnhancer(),
   compose(
     // autoRehydrate({ log: true }),
-    applyMiddleware(ReduxThunk)
+    applyMiddleware(ReduxThunk, logger)
   )
 )
 

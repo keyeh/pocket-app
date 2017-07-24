@@ -9,7 +9,7 @@ import SignUpScreen from "./screens/auth/SignUpScreen"
 import { Ionicons } from "@expo/vector-icons"
 import RootNavigation from "./navigation/RootNavigation"
 import Base from "./Base"
-import { saveUserObject } from "./actions"
+import { saveUserObject, listenToUserData } from "./actions"
 
 export default class App extends React.Component {
   constructor(props) {
@@ -25,6 +25,7 @@ export default class App extends React.Component {
     Base.initializedApp.auth().onAuthStateChanged(user => {
       if (user) {
         Store.dispatch(saveUserObject(user))
+        Store.dispatch(listenToUserData(this, user.uid))
         this.setState({ isAuthed: true })
       } else {
         this.setState({ isAuthed: false })
