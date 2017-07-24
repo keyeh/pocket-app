@@ -54,7 +54,6 @@ class SignInScreen extends React.Component {
           value={formPassword}
         />
         <Button
-          icon={{ name: "envira", type: "font-awesome" }}
           title={authLoading ? "Loading" : "Sign In"}
           onPress={this._handleNextButtonPress}
           style={styles.nextButton}

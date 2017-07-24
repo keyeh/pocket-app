@@ -87,7 +87,6 @@ class SignUpScreen extends React.Component {
         {passwordValidationMessage}
 
         <Button
-          icon={{ name: "envira", type: "font-awesome" }}
           title={authLoading ? "Loading" : "Sign Up"}
           onPress={this._handleNextButtonPress}
           style={styles.nextButton}
