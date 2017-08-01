@@ -16,8 +16,7 @@ class WorkerScreen extends React.Component {
         super(props)
 
         this.state = {
-            formMaxWorkDistance: props.userMaxWorkDistance,
-            check: false
+            formMaxWorkDistance: props.userMaxWorkDistance
         }
 
         this._handleMaxWorkDistanceChange = this._handleMaxWorkDistanceChange.bind(this)
