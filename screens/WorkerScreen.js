@@ -3,7 +3,7 @@ import { connect } from "react-redux"
 
 import { Image, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native"
 import { FormLabel, FormInput, FormValidationMessage, Button, List, ListItem, CheckBox } from "react-native-elements"
-import { WebBrowser } from "expo"
+import { WebBrowser, Permissions } from "expo"
 import Base from "../Base"
 import { MonoText } from "../components/StyledText"
 
@@ -20,6 +20,7 @@ class WorkerScreen extends React.Component {
         }
 
         this._handleMaxWorkDistanceChange = this._handleMaxWorkDistanceChange.bind(this)
+        this._handleLocationButtonPress = this._handleLocationButtonPress.bind(this)
         this._handleSaveButtonPress = this._handleSaveButtonPress.bind(this)
     }
 
@@ -33,6 +34,16 @@ class WorkerScreen extends React.Component {
                 dishes: false,
                 mowLawn: false
             }
+        })
+    }
+
+    _handleLocationButtonPress() {
+        Promise.all([Permissions.getAsync(Permissions.LOCATION), Expo.Location.getCurrentPositionAsync({})]).then(values => {
+            const { coords, timestamp } = values[1]
+            console.log(coords, timestamp)
+            return Base.push(`users/${this.props.fbUid}/locations`, {
+                data: { ...coords, timestamp }
+            })
         })
     }
 
@@ -70,9 +81,10 @@ class WorkerScreen extends React.Component {
                 <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
                     <FormLabel>Max distance</FormLabel>
                     <FormInput onChangeText={this._handleMaxWorkDistanceChange} value={formMaxWorkDistance} />
-                    <Button title="Save" onPress={this._handleSaveButtonPress} checked={this.state.check} style={styles.nextButton} />
+                    <Button title="Save" onPress={this._handleSaveButtonPres} style={styles.nextButton} />
 
                     {listItems}
+                    <Button title="location" onPress={this._handleLocationButtonPress} style={styles.nextButton} />
                 </ScrollView>
             </View>
         )
