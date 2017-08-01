@@ -1,8 +1,8 @@
 import React from "react"
 import { ExpoConfigView } from "@expo/samples"
 import { connect } from "react-redux"
-import { View, Text } from "react-native"
-import { Button } from "react-native-elements"
+import { View } from "react-native"
+import { Button, Text } from "react-native-elements"
 import Base from "../Base"
 
 class SettingsScreen extends React.Component {
@@ -25,8 +25,9 @@ class SettingsScreen extends React.Component {
      * content, we just wanted to give you a quick view of your config */
     return (
       <View>
+        <Text h2>Settings</Text>
         <Text>
-          {/* {JSON.stringify(this.props.reduxTree)} */}
+          U are logged in as: {this.props.userPhone}
         </Text>
         <Button title={"Sign Out"} onPress={this._handleSignOutButtonPress} />
       </View>
@@ -34,7 +35,7 @@ class SettingsScreen extends React.Component {
   }
 }
 
-const mapStateToProps = state => ({ reduxTree: state })
+const mapStateToProps = state => ({ userPhone: state.user.data.phone })
 const mapDispatchToProps = {}
 
 export default connect(mapStateToProps, mapDispatchToProps)(SettingsScreen)
