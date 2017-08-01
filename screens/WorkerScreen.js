@@ -3,9 +3,9 @@ import { connect } from "react-redux"
 
 import { Image, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native"
 import { FormLabel, FormInput, FormValidationMessage, Button, List, ListItem, CheckBox } from "react-native-elements"
-import { WebBrowser, Permissions } from "expo"
+import { Permissions } from "expo"
 import Base from "../Base"
-import { MonoText } from "../components/StyledText"
+import geoFire from "../geoFire"
 
 class WorkerScreen extends React.Component {
     static navigationOptions = {
@@ -40,10 +40,12 @@ class WorkerScreen extends React.Component {
     _handleLocationButtonPress() {
         Promise.all([Permissions.getAsync(Permissions.LOCATION), Expo.Location.getCurrentPositionAsync({})]).then(values => {
             const { coords, timestamp } = values[1]
-            console.log(coords, timestamp)
-            return Base.push(`users/${this.props.fbUid}/locations`, {
-                data: { ...coords, timestamp }
-            })
+            const { latitude, longitude } = coords
+
+            return geoFire.set(this.props.fbUid, [latitude, longitude])
+            // Base.push(``, {
+            //     data: { ...coords, timestamp }
+            // })
         })
     }
 
@@ -81,7 +83,7 @@ class WorkerScreen extends React.Component {
                 <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
                     <FormLabel>Max distance</FormLabel>
                     <FormInput onChangeText={this._handleMaxWorkDistanceChange} value={formMaxWorkDistance} />
-                    <Button title="Save" onPress={this._handleSaveButtonPres} style={styles.nextButton} />
+                    <Button title="Save" onPress={this._handleSaveButtonPress} style={styles.nextButton} />
 
                     {listItems}
                     <Button title="location" onPress={this._handleLocationButtonPress} style={styles.nextButton} />
