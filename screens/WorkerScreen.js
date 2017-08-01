@@ -8,183 +8,171 @@ import Base from "../Base"
 import { MonoText } from "../components/StyledText"
 
 class WorkerScreen extends React.Component {
-  static navigationOptions = {
-    title: "Worker"
-  }
-
-  constructor(props) {
-    super(props)
-
-    this.state = {
-      formMaxWorkDistance: props.userMaxWorkDistance,
-      check: false
+    static navigationOptions = {
+        title: "Worker"
     }
 
-    this._handleMaxWorkDistanceChange = this._handleMaxWorkDistanceChange.bind(this)
-    this._handleSaveButtonPress = this._handleSaveButtonPress.bind(this)
-  }
+    constructor(props) {
+        super(props)
 
-  // static defaultJobTypes =
+        this.state = {
+            formMaxWorkDistance: props.userMaxWorkDistance,
+            check: false
+        }
 
-  componentWillMount() {
-    Base.syncState(`users/${this.props.fbUid}/jobTypes`, {
-      context: this,
-      state: "jobTypes",
-      defaultValue: {
-        dishes: false,
-        mowLawn: false
-      }
-    })
-  }
+        this._handleMaxWorkDistanceChange = this._handleMaxWorkDistanceChange.bind(this)
+        this._handleSaveButtonPress = this._handleSaveButtonPress.bind(this)
+    }
 
-  _handleMaxWorkDistanceChange(newValue) {
-    this.setState({ formMaxWorkDistance: newValue })
-  }
+    // static defaultJobTypes =
 
-  _handleSaveButtonPress() {
-    Base.update(`users/${this.props.fbUid}`, {
-      data: { maxWorkDistance: this.state.formMaxWorkDistance }
-    }).catch(err => {
-      console.error(err)
-    })
-  }
+    componentWillMount() {
+        Base.syncState(`users/${this.props.fbUid}/jobTypes`, {
+            context: this,
+            state: "jobTypes",
+            defaultValue: {
+                dishes: false,
+                mowLawn: false
+            }
+        })
+    }
 
-  _toggleJobType(jobType, event) {
-    this.setState({
-      jobTypes: {
-        ...this.state.jobTypes,
-        [jobType]: !this.state.jobTypes[jobType]
-      }
-    })
-  }
+    _handleMaxWorkDistanceChange(newValue) {
+        this.setState({ formMaxWorkDistance: newValue })
+    }
 
-  render() {
-    const { formMaxWorkDistance } = this.state
+    _handleSaveButtonPress() {
+        Base.update(`users/${this.props.fbUid}`, {
+            data: { maxWorkDistance: this.state.formMaxWorkDistance }
+        }).catch(err => {
+            console.error(err)
+        })
+    }
 
-    const listItems = Object.keys(this.state.jobTypes).map(jobType => {
-      console.log(jobType)
-      return (
-        <CheckBox
-          key={jobType}
-          title={jobType}
-          checked={this.state.jobTypes[jobType]}
-          onPress={this._toggleJobType.bind(this, jobType)}
-        />
-      )
-    })
+    _toggleJobType(jobType, event) {
+        this.setState({
+            jobTypes: {
+                ...this.state.jobTypes,
+                [jobType]: !this.state.jobTypes[jobType]
+            }
+        })
+    }
 
-    return (
-      <View style={styles.container}>
-        <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-          <FormLabel>Max distance</FormLabel>
-          <FormInput onChangeText={this._handleMaxWorkDistanceChange} value={formMaxWorkDistance} />
-          <Button
-            title="Save"
-            onPress={this._handleSaveButtonPress}
-            checked={this.state.check}
-            style={styles.nextButton}
-          />
+    render() {
+        const { formMaxWorkDistance } = this.state
 
-          {listItems}
-        </ScrollView>
-      </View>
-    )
-  }
+        const listItems = Object.keys(this.state.jobTypes).map(jobType => {
+            console.log(jobType)
+            return <CheckBox key={jobType} title={jobType} checked={this.state.jobTypes[jobType]} onPress={this._toggleJobType.bind(this, jobType)} />
+        })
+
+        return (
+            <View style={styles.container}>
+                <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+                    <FormLabel>Max distance</FormLabel>
+                    <FormInput onChangeText={this._handleMaxWorkDistanceChange} value={formMaxWorkDistance} />
+                    <Button title="Save" onPress={this._handleSaveButtonPress} checked={this.state.check} style={styles.nextButton} />
+
+                    {listItems}
+                </ScrollView>
+            </View>
+        )
+    }
 }
 
 const mapStateToProps = state => ({
-  userMaxWorkDistance: state.user.data.maxWorkDistance,
-  fbUid: state.auth.user.uid
+    userMaxWorkDistance: state.user.data.maxWorkDistance,
+    fbUid: state.auth.user.uid
 })
 const mapDispatchToProps = {}
 
 export default connect(mapStateToProps, mapDispatchToProps)(WorkerScreen)
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff"
-  },
-  developmentModeText: {
-    marginBottom: 20,
-    color: "rgba(0,0,0,0.4)",
-    fontSize: 14,
-    lineHeight: 19,
-    textAlign: "center"
-  },
-  contentContainer: {
-    paddingTop: 30
-  },
-  welcomeContainer: {
-    alignItems: "center",
-    marginTop: 10,
-    marginBottom: 20
-  },
-  welcomeImage: {
-    width: 100,
-    height: 80,
-    resizeMode: "contain",
-    marginTop: 3,
-    marginLeft: -10
-  },
-  getStartedContainer: {
-    alignItems: "center",
-    marginHorizontal: 50
-  },
-  homeScreenFilename: {
-    marginVertical: 7
-  },
-  codeHighlightText: {
-    color: "rgba(96,100,109, 0.8)"
-  },
-  codeHighlightContainer: {
-    backgroundColor: "rgba(0,0,0,0.05)",
-    borderRadius: 3,
-    paddingHorizontal: 4
-  },
-  getStartedText: {
-    fontSize: 17,
-    color: "rgba(96,100,109, 1)",
-    lineHeight: 24,
-    textAlign: "center"
-  },
-  tabBarInfoContainer: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    ...Platform.select({
-      ios: {
-        shadowColor: "black",
-        shadowOffset: { height: -3 },
-        shadowOpacity: 0.1,
-        shadowRadius: 3
-      },
-      android: {
-        elevation: 20
-      }
-    }),
-    alignItems: "center",
-    backgroundColor: "#fbfbfb",
-    paddingVertical: 20
-  },
-  tabBarInfoText: {
-    fontSize: 17,
-    color: "rgba(96,100,109, 1)",
-    textAlign: "center"
-  },
-  navigationFilename: {
-    marginTop: 5
-  },
-  helpContainer: {
-    marginTop: 15,
-    alignItems: "center"
-  },
-  helpLink: {
-    paddingVertical: 15
-  },
-  helpLinkText: {
-    fontSize: 14,
-    color: "#2e78b7"
-  }
+    container: {
+        flex: 1,
+        backgroundColor: "#fff"
+    },
+    developmentModeText: {
+        marginBottom: 20,
+        color: "rgba(0,0,0,0.4)",
+        fontSize: 14,
+        lineHeight: 19,
+        textAlign: "center"
+    },
+    contentContainer: {
+        paddingTop: 30
+    },
+    welcomeContainer: {
+        alignItems: "center",
+        marginTop: 10,
+        marginBottom: 20
+    },
+    welcomeImage: {
+        width: 100,
+        height: 80,
+        resizeMode: "contain",
+        marginTop: 3,
+        marginLeft: -10
+    },
+    getStartedContainer: {
+        alignItems: "center",
+        marginHorizontal: 50
+    },
+    homeScreenFilename: {
+        marginVertical: 7
+    },
+    codeHighlightText: {
+        color: "rgba(96,100,109, 0.8)"
+    },
+    codeHighlightContainer: {
+        backgroundColor: "rgba(0,0,0,0.05)",
+        borderRadius: 3,
+        paddingHorizontal: 4
+    },
+    getStartedText: {
+        fontSize: 17,
+        color: "rgba(96,100,109, 1)",
+        lineHeight: 24,
+        textAlign: "center"
+    },
+    tabBarInfoContainer: {
+        position: "absolute",
+        bottom: 0,
+        left: 0,
+        right: 0,
+        ...Platform.select({
+            ios: {
+                shadowColor: "black",
+                shadowOffset: { height: -3 },
+                shadowOpacity: 0.1,
+                shadowRadius: 3
+            },
+            android: {
+                elevation: 20
+            }
+        }),
+        alignItems: "center",
+        backgroundColor: "#fbfbfb",
+        paddingVertical: 20
+    },
+    tabBarInfoText: {
+        fontSize: 17,
+        color: "rgba(96,100,109, 1)",
+        textAlign: "center"
+    },
+    navigationFilename: {
+        marginTop: 5
+    },
+    helpContainer: {
+        marginTop: 15,
+        alignItems: "center"
+    },
+    helpLink: {
+        paddingVertical: 15
+    },
+    helpLinkText: {
+        fontSize: 14,
+        color: "#2e78b7"
+    }
 })
