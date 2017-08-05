@@ -3,9 +3,10 @@ import { connect } from "react-redux"
 
 import { Image, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native"
 import { FormLabel, FormInput, FormValidationMessage, Button, List, ListItem, CheckBox } from "react-native-elements"
-import { Permissions } from "expo"
 import Base from "../Base"
 import geoFire from "../geoFire"
+import JobTypesTemplate from "../constants/JobTypesTemplate"
+import updateUserLocation from "../api/updateUserLocation"
 
 class WorkerScreen extends React.Component {
     static navigationOptions = {
@@ -16,7 +17,8 @@ class WorkerScreen extends React.Component {
         super(props)
 
         this.state = {
-            formMaxWorkDistance: props.userMaxWorkDistance
+            formMaxWorkDistance: props.userMaxWorkDistance,
+            jobTypes: {}
         }
 
         this._handleMaxWorkDistanceChange = this._handleMaxWorkDistanceChange.bind(this)
@@ -27,26 +29,15 @@ class WorkerScreen extends React.Component {
     // static defaultJobTypes =
 
     componentWillMount() {
-        Base.syncState(`users/${this.props.fbUid}/jobTypes`, {
+        Base.syncState(`workerJobTypes/${this.props.fbUid}`, {
             context: this,
             state: "jobTypes",
-            defaultValue: {
-                dishes: false,
-                mowLawn: false
-            }
+            defaultValue: JobTypesTemplate
         })
     }
 
     _handleLocationButtonPress() {
-        Promise.all([Permissions.getAsync(Permissions.LOCATION), Expo.Location.getCurrentPositionAsync({})]).then(values => {
-            const { coords, timestamp } = values[1]
-            const { latitude, longitude } = coords
-
-            return geoFire.set(this.props.fbUid, [latitude, longitude])
-            // Base.push(``, {
-            //     data: { ...coords, timestamp }
-            // })
-        })
+        updateUserLocation(this.props.fbUid)
     }
 
     _handleMaxWorkDistanceChange(newValue) {
@@ -64,6 +55,7 @@ class WorkerScreen extends React.Component {
     _toggleJobType(jobType, event) {
         this.setState({
             jobTypes: {
+                ...JobTypesTemplate,
                 ...this.state.jobTypes,
                 [jobType]: !this.state.jobTypes[jobType]
             }
@@ -73,8 +65,7 @@ class WorkerScreen extends React.Component {
     render() {
         const { formMaxWorkDistance } = this.state
 
-        const listItems = Object.keys(this.state.jobTypes).map(jobType => {
-            console.log(jobType)
+        const listItems = Object.keys(JobTypesTemplate).map(jobType => {
             return <CheckBox key={jobType} title={jobType} checked={this.state.jobTypes[jobType]} onPress={this._toggleJobType.bind(this, jobType)} />
         })
 
