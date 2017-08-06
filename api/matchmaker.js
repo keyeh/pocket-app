@@ -52,14 +52,25 @@ const matchMe = async (fbUid, jobType) => {
 
     const commonKeys = _.intersection(_.keys(workersInRange), _.keys(workersWithJobType))
 
-    let matchedWorkers = {}
-    if (commonKeys.length !== 0) {
-        matchedWorkers = Object.assign.apply(null, commonKeys.map(k => ({ [k]: workersInRange[k] })))
-        delete matchedWorkers[fbUid]
-    }
+    const matchedWorkers = Object.assign(
+        ...commonKeys.map(k => {
+            if (k === fbUid) {
+                return
+            }
+            return {
+                [k]: { distance: workersInRange[k] }
+            }
+        })
+    )
 
     const order = await Base.push("orders", {
-        data: { requesterFbUid: fbUid, matchedWorkers, jobType, hasNotifiedWorkers: false }
+        data: {
+            requesterFbUid: fbUid,
+            jobType,
+            matchedWorkers,
+            hasNotifiedWorkers: false,
+            address: "123 Example Street, San Francisco, CA"
+        }
     })
 
     return order.key

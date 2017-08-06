@@ -1,7 +1,7 @@
 import React from "react"
 import { connect } from "react-redux"
 import { Image, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native"
-import { FormLabel, FormInput, FormValidationMessage, Button, List, ListItem, CheckBox } from "react-native-elements"
+import { FormLabel, FormInput, FormValidationMessage, Button, List, ListItem, CheckBox, Card } from "react-native-elements"
 import Base from "../Base"
 import JobTypesTemplate from "../constants/JobTypesTemplate"
 import updateUserLocation from "../api/updateUserLocation"
@@ -15,8 +15,9 @@ class WorkerScreen extends React.Component {
         super(props)
 
         this.state = {
-            formMaxWorkDistance: props.userMaxWorkDistance,
-            jobTypes: {}
+            jobTypes: {},
+            availableJobs: {},
+            acceptedJobs: {}
         }
 
         this._handleLocationButtonPress = this._handleLocationButtonPress.bind(this)
@@ -25,15 +26,51 @@ class WorkerScreen extends React.Component {
     // static defaultJobTypes =
 
     componentWillMount() {
-        Base.syncState(`workerJobTypes/${this.props.fbUid}`, {
+        const { fbUid } = this.props
+        Base.syncState(`workerJobTypes/${fbUid}`, {
             context: this,
             state: "jobTypes",
             defaultValue: JobTypesTemplate
+        })
+
+        Base.syncState(`orders`, {
+            context: this,
+            state: "availableJobs",
+            defaultValue: {},
+            queries: {
+                orderByChild: `matchedWorkers/${fbUid}/distance`,
+                startAt: 0
+            }
+        })
+
+        Base.syncState(`orders`, {
+            context: this,
+            state: "acceptedJobs",
+            defaultValue: {},
+            queries: {
+                orderByChild: "worker",
+                equalTo: fbUid
+            }
         })
     }
 
     _handleLocationButtonPress() {
         updateUserLocation(this.props.fbUid)
+    }
+
+    _handleAcceptOrder(orderId) {
+        Base.update(`orders/${orderId}`, {
+            data: {
+                worker: this.props.fbUid,
+                // matchedWorkersArchive: this.state.availableJobs[orderId].matchedWorkers,
+                matchedWorkers: null
+            }
+        })
+    }
+
+    _handleDeclineOrder(orderId) {
+        const { fbUid } = this.props
+        Base.remove(`orders/${orderId}/matchedWorkers/${fbUid}`)
     }
 
     _toggleJobType(jobType, event) {
@@ -47,10 +84,45 @@ class WorkerScreen extends React.Component {
     }
 
     render() {
-        const { formMaxWorkDistance } = this.state
+        const { jobTypes, availableJobs, acceptedJobs } = this.state
+        const { fbUid } = this.props
 
         const listItems = Object.keys(JobTypesTemplate).map(jobType => {
             return <CheckBox key={jobType} title={jobType} checked={this.state.jobTypes[jobType]} onPress={this._toggleJobType.bind(this, jobType)} />
+        })
+
+        const availableJobsCards = Object.keys(availableJobs).map(k => {
+            const order = availableJobs[k]
+            const distance = order.matchedWorkers[fbUid].distance
+            if (!jobTypes[order.jobType]) {
+                return null
+            }
+            return (
+                <Card key={k}>
+                    <Text>
+                        {order.jobType}
+                    </Text>
+                    <Text>
+                        {distance} miles from you
+                    </Text>
+                    <Button title="accept" onPress={this._handleAcceptOrder.bind(this, k)} />
+                    <Button title="decline" onPress={this._handleDeclineOrder.bind(this, k)} />
+                </Card>
+            )
+        })
+
+        const acceptedJobsCards = Object.keys(acceptedJobs).map(k => {
+            const order = acceptedJobs[k]
+            return (
+                <Card key={k}>
+                    <Text>
+                        doing {order.jobType}
+                    </Text>
+                    <Text>
+                        Address: {order.address}
+                    </Text>
+                </Card>
+            )
         })
 
         return (
@@ -60,6 +132,8 @@ class WorkerScreen extends React.Component {
 
                     {listItems}
                     <Button title="location" onPress={this._handleLocationButtonPress} style={styles.nextButton} />
+                    {availableJobsCards}
+                    {acceptedJobsCards}
                 </ScrollView>
             </View>
         )
@@ -67,7 +141,6 @@ class WorkerScreen extends React.Component {
 }
 
 const mapStateToProps = state => ({
-    userMaxWorkDistance: state.user.data.maxWorkDistance,
     fbUid: state.auth.user.uid
 })
 const mapDispatchToProps = {}
