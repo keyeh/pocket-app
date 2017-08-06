@@ -2,7 +2,7 @@ import React from "react"
 import { connect } from "react-redux"
 
 import { Image, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native"
-import { FormLabel, FormInput, FormValidationMessage, Button, List, ListItem, CheckBox } from "react-native-elements"
+import { FormLabel, FormInput, FormValidationMessage, Button, List, ListItem, CheckBox, Card } from "react-native-elements"
 import { Permissions } from "expo"
 import Base from "../Base"
 import geoFire from "../geoFire"
@@ -65,27 +65,30 @@ class ClientScreen extends React.Component {
             const order = this.state.orders[orderId]
 
             return (
-                <View key={orderId} style={{ marginBottom: 10 }}>
+                <Card key={orderId}>
                     <Text>
-                        order id: {orderId}
+                        order: {orderId}
                     </Text>
                     <Text>
-                        jobType: {order.jobType}
+                        for: {order.jobType}
                     </Text>
                     <Text>
-                        total workers: {JSON.stringify(order.matchedWorkers)}
+                        at: {order.address}
                     </Text>
-                </View>
+                    <Text>
+                        Your worker: {order.worker || "none assigned"}
+                    </Text>
+                </Card>
             )
         })
 
         return (
             <View style={styles.container}>
-                <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-                    <FormLabel>whatchu want fam?</FormLabel>
-                    {listItems}
-                    <Button title="Go" onPress={this._handleExecuteButtonPress} style={styles.nextButton} />
+                <FormLabel>whatchu want fam?</FormLabel>
+                {listItems}
+                <Button title="Go" onPress={this._handleExecuteButtonPress} style={styles.nextButton} />
 
+                <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
                     {orders}
                 </ScrollView>
             </View>

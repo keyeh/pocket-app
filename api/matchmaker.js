@@ -1,6 +1,7 @@
 import geoFire from "../geoFire"
 import Base from "../Base"
 import _ from "lodash"
+import firebase from "firebase"
 
 const findWorkersInRange = async fbUid => {
     const location = await geoFire.get(fbUid)
@@ -53,6 +54,7 @@ const matchMe = async (fbUid, jobType) => {
     const commonKeys = _.intersection(_.keys(workersInRange), _.keys(workersWithJobType))
 
     const matchedWorkers = Object.assign(
+        [],
         ...commonKeys.map(k => {
             if (k === fbUid) {
                 return
@@ -69,7 +71,9 @@ const matchMe = async (fbUid, jobType) => {
             jobType,
             matchedWorkers,
             hasNotifiedWorkers: false,
-            address: "123 Example Street, San Francisco, CA"
+            address: "123 Example Street, San Francisco, CA",
+            createdAt: firebase.database.ServerValue.TIMESTAMP,
+            matchingEndsOffsetMs: 1 * 60 * 1000
         }
     })
 

@@ -1,11 +1,12 @@
 import React from "react"
 import { connect } from "react-redux"
+import prettyMs from "pretty-ms"
 import { Image, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native"
 import { FormLabel, FormInput, FormValidationMessage, Button, List, ListItem, CheckBox, Card } from "react-native-elements"
 import Base from "../Base"
 import JobTypesTemplate from "../constants/JobTypesTemplate"
 import updateUserLocation from "../api/updateUserLocation"
-
+import ProgressBar from "react-native-progress/Bar"
 class WorkerScreen extends React.Component {
     static navigationOptions = {
         title: "Worker"
@@ -15,18 +16,23 @@ class WorkerScreen extends React.Component {
         super(props)
 
         this.state = {
+            timestamp: Date.now(),
             jobTypes: {},
             availableJobs: {},
             acceptedJobs: {}
         }
 
         this._handleLocationButtonPress = this._handleLocationButtonPress.bind(this)
+        this._updateDateNowState = this._updateDateNowState.bind(this)
     }
 
     // static defaultJobTypes =
 
     componentWillMount() {
         const { fbUid } = this.props
+
+        this.ticker = setInterval(this._updateDateNowState, 750)
+
         Base.syncState(`workerJobTypes/${fbUid}`, {
             context: this,
             state: "jobTypes",
@@ -52,6 +58,15 @@ class WorkerScreen extends React.Component {
                 equalTo: fbUid
             }
         })
+    }
+
+    componentWillUnmount() {
+        clearTimeout(this.ticker)
+    }
+
+    _updateDateNowState() {
+        console.log("update")
+        this.setState({ timestamp: Math.round(Date.now() / 1000) * 1000 })
     }
 
     _handleLocationButtonPress() {
@@ -84,7 +99,7 @@ class WorkerScreen extends React.Component {
     }
 
     render() {
-        const { jobTypes, availableJobs, acceptedJobs } = this.state
+        const { jobTypes, availableJobs, acceptedJobs, timestamp } = this.state
         const { fbUid } = this.props
 
         const listItems = Object.keys(JobTypesTemplate).map(jobType => {
@@ -94,7 +109,9 @@ class WorkerScreen extends React.Component {
         const availableJobsCards = Object.keys(availableJobs).map(k => {
             const order = availableJobs[k]
             const distance = order.matchedWorkers[fbUid].distance
-            if (!jobTypes[order.jobType]) {
+            const timeLeft = order.createdAt + order.matchingEndsOffsetMs - timestamp
+
+            if (!jobTypes[order.jobType] || timeLeft <= 0) {
                 return null
             }
             return (
@@ -105,6 +122,10 @@ class WorkerScreen extends React.Component {
                     <Text>
                         {distance} miles from you
                     </Text>
+                    <Text>
+                        {prettyMs(timeLeft, { secDecimalDigits: 0, verbose: true })} remaining to accept
+                    </Text>
+                    <ProgressBar progress={timeLeft / order.matchingEndsOffsetMs} width={200} />
                     <Button title="accept" onPress={this._handleAcceptOrder.bind(this, k)} />
                     <Button title="decline" onPress={this._handleDeclineOrder.bind(this, k)} />
                 </Card>
@@ -127,11 +148,11 @@ class WorkerScreen extends React.Component {
 
         return (
             <View style={styles.container}>
-                <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-                    <Text>I am willing to do:</Text>
+                <Text>I am willing to do:</Text>
 
-                    {listItems}
-                    <Button title="location" onPress={this._handleLocationButtonPress} style={styles.nextButton} />
+                {listItems}
+                <Button title="location" onPress={this._handleLocationButtonPress} style={styles.nextButton} />
+                <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
                     {availableJobsCards}
                     {acceptedJobsCards}
                 </ScrollView>
