@@ -4,12 +4,15 @@ import { Provider } from "react-redux"
 import { connect } from "react-redux"
 import Store from "./Store"
 import Shell from "./Shell"
+
+console.disableYellowBox = true
+
 export default class App extends React.Component {
-  render() {
-    return (
-      <Provider store={Store}>
-        <Shell />
-      </Provider>
-    )
-  }
+    render() {
+        return (
+            <Provider store={Store}>
+                <Shell />
+            </Provider>
+        )
+    }
 }

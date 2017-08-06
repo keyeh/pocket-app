@@ -55,10 +55,11 @@ const matchMe = async (fbUid, jobType) => {
     let matchedWorkers = {}
     if (commonKeys.length !== 0) {
         matchedWorkers = Object.assign.apply(null, commonKeys.map(k => ({ [k]: workersInRange[k] })))
+        delete matchedWorkers[fbUid]
     }
 
     const order = await Base.push("orders", {
-        data: { requesterFbUid: fbUid, matchedWorkers, jobType }
+        data: { requesterFbUid: fbUid, matchedWorkers, jobType, hasNotifiedWorkers: false }
     })
 
     return order.key

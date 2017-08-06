@@ -1,10 +1,8 @@
 import React from "react"
 import { connect } from "react-redux"
-
 import { Image, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native"
 import { FormLabel, FormInput, FormValidationMessage, Button, List, ListItem, CheckBox } from "react-native-elements"
 import Base from "../Base"
-import geoFire from "../geoFire"
 import JobTypesTemplate from "../constants/JobTypesTemplate"
 import updateUserLocation from "../api/updateUserLocation"
 
@@ -21,9 +19,7 @@ class WorkerScreen extends React.Component {
             jobTypes: {}
         }
 
-        this._handleMaxWorkDistanceChange = this._handleMaxWorkDistanceChange.bind(this)
         this._handleLocationButtonPress = this._handleLocationButtonPress.bind(this)
-        this._handleSaveButtonPress = this._handleSaveButtonPress.bind(this)
     }
 
     // static defaultJobTypes =
@@ -38,18 +34,6 @@ class WorkerScreen extends React.Component {
 
     _handleLocationButtonPress() {
         updateUserLocation(this.props.fbUid)
-    }
-
-    _handleMaxWorkDistanceChange(newValue) {
-        this.setState({ formMaxWorkDistance: newValue })
-    }
-
-    _handleSaveButtonPress() {
-        Base.update(`users/${this.props.fbUid}`, {
-            data: { maxWorkDistance: this.state.formMaxWorkDistance }
-        }).catch(err => {
-            console.error(err)
-        })
     }
 
     _toggleJobType(jobType, event) {
@@ -72,9 +56,7 @@ class WorkerScreen extends React.Component {
         return (
             <View style={styles.container}>
                 <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-                    <FormLabel>Max distance</FormLabel>
-                    <FormInput onChangeText={this._handleMaxWorkDistanceChange} value={formMaxWorkDistance} />
-                    <Button title="Save" onPress={this._handleSaveButtonPress} style={styles.nextButton} />
+                    <Text>I am willing to do:</Text>
 
                     {listItems}
                     <Button title="location" onPress={this._handleLocationButtonPress} style={styles.nextButton} />
