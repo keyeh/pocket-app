@@ -94,12 +94,16 @@ class WorkerScreen extends React.Component {
     }
 
     _handleDeclineOrder(orderId) {
-        const { availableJobs } = this.state
+        const { availableJobs, fbUid } = this.state
         console.log({ availableJobs: _.omit(availableJobs, orderId) })
         this.setState({
-            availableJobs: {
-                ...availableJobs,
-                [orderId]: null
+            availableJobs: { ...availableJobs, [orderId]: null }
+        })
+
+        Base.update(`orders/${orderId}/worker`, {
+            data: {
+                worker: this.props.fbUid,
+                [`availableWorkers/${fbUid}`]: false
             }
         })
     }
