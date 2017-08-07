@@ -38,7 +38,7 @@ class ClientScreen extends React.Component {
 
     async _handleExecuteButtonPress() {
         await updateUserLocation(this.props.fbUid)
-        const orderId = await createOrder.matchMe(this.props.fbUid, this.state.selectedJobType)
+        const orderId = await createOrder(this.props.fbUid, this.state.selectedJobType)
         console.log(orderId)
     }
 

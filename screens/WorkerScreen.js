@@ -2,7 +2,17 @@ import React from "react"
 import { connect } from "react-redux"
 import prettyMs from "pretty-ms"
 import { Image, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native"
-import { FormLabel, FormInput, FormValidationMessage, Button, List, ListItem, CheckBox, Card } from "react-native-elements"
+import _ from "lodash"
+import {
+    FormLabel,
+    FormInput,
+    FormValidationMessage,
+    Button,
+    List,
+    ListItem,
+    CheckBox,
+    Card
+} from "react-native-elements"
 import Base from "../Base"
 import JobTypesTemplate from "../constants/JobTypesTemplate"
 import updateUserLocation from "../api/updateUserLocation"
@@ -39,12 +49,13 @@ class WorkerScreen extends React.Component {
             defaultValue: JobTypesTemplate
         })
 
-        Base.syncState(`orders`, {
+        Base.syncState(`users/${fbUid}/availableJobsAsWorker`, {
             context: this,
             state: "availableJobs",
             defaultValue: {},
             queries: {
-                orderByChild: `matchedWorkers/${fbUid}/distance`,
+                orderByChild: `matchingEndsAt`,
+                // startAt: Date.now() - 1 * 60 * 1000
                 startAt: 0
             }
         })
@@ -74,18 +85,23 @@ class WorkerScreen extends React.Component {
     }
 
     _handleAcceptOrder(orderId) {
+        this._handleDeclineOrder(orderId)
         Base.update(`orders/${orderId}`, {
             data: {
-                worker: this.props.fbUid,
-                // matchedWorkersArchive: this.state.availableJobs[orderId].matchedWorkers,
-                matchedWorkers: null
+                worker: this.props.fbUid
             }
         })
     }
 
     _handleDeclineOrder(orderId) {
-        const { fbUid } = this.props
-        Base.remove(`orders/${orderId}/matchedWorkers/${fbUid}`)
+        const { availableJobs } = this.state
+        console.log({ availableJobs: _.omit(availableJobs, orderId) })
+        this.setState({
+            availableJobs: {
+                ...availableJobs,
+                [orderId]: null
+            }
+        })
     }
 
     _toggleJobType(jobType, event) {
@@ -103,39 +119,55 @@ class WorkerScreen extends React.Component {
         const { fbUid } = this.props
 
         const listItems = Object.keys(JobTypesTemplate).map(jobType => {
-            return <CheckBox key={jobType} title={jobType} checked={this.state.jobTypes[jobType]} onPress={this._toggleJobType.bind(this, jobType)} />
+            return (
+                <CheckBox
+                    key={jobType}
+                    title={jobType}
+                    checked={this.state.jobTypes[jobType]}
+                    onPress={this._toggleJobType.bind(this, jobType)}
+                />
+            )
         })
 
         const availableJobsCards = Object.keys(availableJobs).map(k => {
-            const order = availableJobs[k]
-            const distance = order.matchedWorkers[fbUid].distance
-            const timeLeft = order.createdAt + order.matchingEndsOffsetMs - timestamp
+            console.log("availableJobsCards")
+            const job = availableJobs[k]
+            const distance = job.distance
+            const timeLeft = job.matchingEndsAt - timestamp
 
-            if (!jobTypes[order.jobType] || timeLeft <= 0) {
-                return null
+            if (jobTypes[job.jobType] && timeLeft >= 0) {
+                return (
+                    <Card key={k}>
+                        <Text>
+                            {job.jobType}
+                        </Text>
+                        <Text>
+                            {distance} miles from you
+                        </Text>
+                        <Text>
+                            {prettyMs(timeLeft, { secDecimalDigits: 0, verbose: true })} remaining
+                            to accept
+                        </Text>
+                        <ProgressBar progress={timeLeft / (1 * 60 * 1000)} width={200} />
+                        <Button title="accept" onPress={this._handleAcceptOrder.bind(this, k)} />
+                        <Button title="decline" onPress={this._handleDeclineOrder.bind(this, k)} />
+                    </Card>
+                )
             }
             return (
                 <Card key={k}>
                     <Text>
-                        {order.jobType}
+                        Missed {job.jobType} {distance} miles from you!
                     </Text>
-                    <Text>
-                        {distance} miles from you
-                    </Text>
-                    <Text>
-                        {prettyMs(timeLeft, { secDecimalDigits: 0, verbose: true })} remaining to accept
-                    </Text>
-                    <ProgressBar progress={timeLeft / order.matchingEndsOffsetMs} width={200} />
-                    <Button title="accept" onPress={this._handleAcceptOrder.bind(this, k)} />
-                    <Button title="decline" onPress={this._handleDeclineOrder.bind(this, k)} />
                 </Card>
             )
         })
 
         const acceptedJobsCards = Object.keys(acceptedJobs).map(k => {
+            console.log("acceptedJobsCards")
             const order = acceptedJobs[k]
             return (
-                <Card key={k}>
+                <Card key={k} style={{ backgroundColor: "lime" }}>
                     <Text>
                         doing {order.jobType}
                     </Text>
@@ -151,8 +183,15 @@ class WorkerScreen extends React.Component {
                 <Text>I am willing to do:</Text>
 
                 {listItems}
-                <Button title="location" onPress={this._handleLocationButtonPress} style={styles.nextButton} />
-                <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+                <Button
+                    title="location"
+                    onPress={this._handleLocationButtonPress}
+                    style={styles.nextButton}
+                />
+                <ScrollView
+                    style={styles.container}
+                    contentContainerStyle={styles.contentContainer}
+                >
                     {availableJobsCards}
                     {acceptedJobsCards}
                 </ScrollView>

@@ -8,8 +8,7 @@ const createOrder = async (fbUid, jobType) => {
             jobType,
             hasNotifiedWorkers: false,
             address: "123 Example Street, San Francisco, CA",
-            createdAt: firebase.database.ServerValue.TIMESTAMP,
-            matchingEndsOffsetMs: 1 * 60 * 1000
+            createdAt: firebase.database.ServerValue.TIMESTAMP
         }
     })
 
