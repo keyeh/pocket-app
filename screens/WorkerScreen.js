@@ -33,7 +33,7 @@ class WorkerScreen extends React.Component {
 
         this.ticker = setInterval(this._updateDateNowState, 750)
 
-        Base.syncState(`workerJobTypes/${fbUid}`, {
+        Base.syncState(`users/${fbUid}/jobTypes`, {
             context: this,
             state: "jobTypes",
             defaultValue: JobTypesTemplate

@@ -38,10 +38,10 @@ const findWorkersInRange = async fbUid => {
 // }
 
 const findWorkersWithJobType = jobType => {
-    return Base.fetch(`workerJobTypes`, {
+    return Base.fetch(`users`, {
         context: this,
         queries: {
-            orderByChild: jobType,
+            orderByChild: `jobTypes/${jobType}`,
             equalTo: true
         }
     })
