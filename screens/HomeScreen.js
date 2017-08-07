@@ -5,10 +5,9 @@ import { Image, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View }
 import { FormLabel, FormInput, FormValidationMessage, Button, List, ListItem, CheckBox, Card } from "react-native-elements"
 import { Permissions } from "expo"
 import Base from "../Base"
-import geoFire from "../geoFire"
 import JobTypesTemplate from "../constants/JobTypesTemplate"
 import updateUserLocation from "../api/updateUserLocation"
-import matchmaker from "../api/matchmaker"
+import createOrder from "../api/createOrder"
 
 class ClientScreen extends React.Component {
     static navigationOptions = {
@@ -39,7 +38,7 @@ class ClientScreen extends React.Component {
 
     async _handleExecuteButtonPress() {
         await updateUserLocation(this.props.fbUid)
-        const orderId = await matchmaker.matchMe(this.props.fbUid, this.state.selectedJobType)
+        const orderId = await createOrder.matchMe(this.props.fbUid, this.state.selectedJobType)
         console.log(orderId)
     }
 
